@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { connect } from 'react-redux';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../actions';
 
 import Header from './Header';
@@ -8,29 +8,32 @@ import Landing from './Landing';
 import Dashboard from './Dashboard';
 import BlogNew from './blogs/BlogNew';
 import BlogShow from './blogs/BlogShow';
+import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
 
-class App extends Component {
-  componentDidMount() {
-    this.props.fetchUser();
-  }
+function App() {
+  const dispatch = useDispatch();
+  const auth = useSelector(state => state.auth);
 
-  render() {
-    return (
-      <div className="container">
-        <BrowserRouter>
-          <div>
-            <Header />
-            <Switch>
-              <Route path="/blogs/new" component={BlogNew} />
-              <Route exact path="/blogs/:_id" component={BlogShow} />
-              <Route path="/blogs" component={Dashboard} />
-              <Route path="/" component={Landing} />
-            </Switch>
-          </div>
-        </BrowserRouter>
-      </div>
-    );
-  }
+  useEffect(() => {
+    dispatch(actions.fetchUser());
+  }, [dispatch]);
+
+  return (
+    <div className="container">
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route path="/auth/login" element={<LoginForm />} />
+          <Route path="/auth/register" element={<RegisterForm />} />
+          <Route path="/blogs/new" element={auth ? <BlogNew /> : <Navigate to="/" />} />
+          <Route path="/blogs/:_id" element={<BlogShow />} />
+          <Route path="/blogs" element={auth ? <Dashboard /> : <Navigate to="/" />} />
+          <Route path="/" element={<Landing />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
+  );
 }
 
-export default connect(null, actions)(App);
+export default App;

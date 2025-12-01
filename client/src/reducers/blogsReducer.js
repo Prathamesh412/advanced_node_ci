@@ -1,13 +1,18 @@
-import mapKeys from 'lodash/mapKeys';
-import { FETCH_BLOGS, FETCH_BLOG } from '../actions/types';
+import { FETCH_BLOGS, FETCH_BLOG } from '../actions';
 
-export default function(state = {}, action) {
+export default function blogsReducer(state = {}, action) {
   switch (action.type) {
     case FETCH_BLOG:
-      const blog = action.payload;
-      return { ...state, [blog._id]: blog };
+      return {
+        ...state,
+        [action.payload._id]: action.payload
+      };
     case FETCH_BLOGS:
-      return { ...state, ...mapKeys(action.payload, '_id') };
+      const blogsMap = {};
+      action.payload.forEach(blog => {
+        blogsMap[blog._id] = blog;
+      });
+      return blogsMap;
     default:
       return state;
   }

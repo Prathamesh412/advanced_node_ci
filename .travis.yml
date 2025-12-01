@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - "20"
+dist: bionic
+services:
+  - mongodb
+  - redis-server
+env:
+  - NODE_ENV=ci PORT=3000
+script:
+  - nohup npm run start & nohup npm run test & sleep 10 
+# branches:
+#   only:
+#     - master
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+cache:
+  directories:
+    - node_modules
+    - client/node_modules
+install:
+  - npm install
+  - npm run build

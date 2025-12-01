@@ -1,58 +1,76 @@
-// BlogForm shows a form for a user to add input
-import _ from 'lodash';
-import React, { Component } from 'react';
-import { reduxForm, Field } from 'redux-form';
-import { Link } from 'react-router-dom';
-import BlogField from './BlogField';
-import formFields from './formFields';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-class BlogForm extends Component {
-  renderFields() {
-    return _.map(formFields, ({ label, name }) => {
-      return (
-        <Field
-          key={name}
-          component={BlogField}
-          type="text"
-          label={label}
-          name={name}
-        />
-      );
-    });
-  }
+function BlogForm({ onSubmit, initialValues }) {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState(initialValues || { title: '', content: '' });
+  const [errors, setErrors] = useState({});
 
-  render() {
-    return (
-      <div>
-        <form onSubmit={this.props.handleSubmit(this.props.onBlogSubmit)}>
-          {this.renderFields()}
-          <Link to="/blogs" className="red btn-flat white-text">
-            Cancel
-          </Link>
-          <button type="submit" className="teal btn-flat right white-text">
-            Next
-            <i className="material-icons right">done</i>
-          </button>
-        </form>
-      </div>
-    );
-  }
-}
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-function validate(values) {
-  const errors = {};
-
-  _.each(formFields, ({ name }) => {
-    if (!values[name]) {
-      errors[name] = 'You must provide a value';
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
     }
-  });
+    if (!formData.content.trim()) {
+      newErrors.content = 'Content is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  return errors;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onSubmit(formData);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="input-field">
+        <label htmlFor="title">Blog Title</label>
+        <input
+          id="title"
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          className={errors.title ? 'invalid' : ''}
+        />
+        {errors.title && <span className="helper-text">{errors.title}</span>}
+      </div>
+
+      <div className="input-field">
+        <label htmlFor="content">Blog Content</label>
+        <textarea
+          id="content"
+          name="content"
+          value={formData.content}
+          onChange={handleChange}
+          className={`materialize-textarea ${errors.content ? 'invalid' : ''}`}
+        />
+        {errors.content && <span className="helper-text">{errors.content}</span>}
+      </div>
+
+      <button type="submit" className="btn">Submit</button>
+      <button 
+        type="button" 
+        onClick={() => navigate('/blogs')}
+        className="btn grey"
+        style={{ marginLeft: '10px' }}
+      >
+        Cancel
+      </button>
+    </form>
+  );
 }
 
-export default reduxForm({
-  validate,
-  form: 'blogForm',
-  destroyOnUnmount: false
-})(BlogForm);
+export default BlogForm;

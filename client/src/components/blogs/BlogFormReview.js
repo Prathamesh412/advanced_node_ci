@@ -1,66 +1,50 @@
-// BlogFormReview shows users their form inputs for review
-import _ from 'lodash';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import formFields from './formFields';
-import { withRouter } from 'react-router-dom';
-import * as actions from '../../actions';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-class BlogFormReview extends Component {
-  renderFields() {
-    const { formValues } = this.props;
+function BlogFormReview({ formValues, onSubmit, onBack }) {
+  const navigate = useNavigate();
 
-    return _.map(formFields, ({ name, label }) => {
-      return (
-        <div key={name}>
-          <label>{label}</label>
-          <div>{formValues[name]}</div>
-        </div>
-      );
-    });
+  if (!formValues) {
+    return <div>Loading...</div>;
   }
 
-  renderButtons() {
-    const { onCancel } = this.props;
+  const { title, content } = formValues;
 
-    return (
+  const handleSubmit = async () => {
+    try {
+      await onSubmit(formValues);
+      navigate('/blogs');
+    } catch (error) {
+      console.error('Error submitting blog:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h5>Please review your blog</h5>
       <div>
-        <button
-          className="yellow darken-3 white-text btn-flat"
-          onClick={onCancel}
-        >
-          Back
-        </button>
-        <button className="green btn-flat right white-text">
-          Save Blog
-          <i className="material-icons right">email</i>
-        </button>
+        <h6>Title</h6>
+        <p>{title}</p>
       </div>
-    );
-  }
+      <div>
+        <h6>Content</h6>
+        <p>{content}</p>
+      </div>
 
-  onSubmit(event) {
-    event.preventDefault();
-
-    const { submitBlog, history, formValues } = this.props;
-
-    submitBlog(formValues, history);
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.onSubmit.bind(this)}>
-        <h5>Please confirm your entries</h5>
-        {this.renderFields()}
-
-        {this.renderButtons()}
-      </form>
-    );
-  }
+      <button 
+        onClick={onBack}
+        className="btn grey"
+      >
+        Back
+      </button>
+      <button 
+        onClick={handleSubmit}
+        className="btn red right"
+      >
+        Submit Blog
+      </button>
+    </div>
+  );
 }
 
-function mapStateToProps(state) {
-  return { formValues: state.form.blogForm.values };
-}
-
-export default connect(mapStateToProps, actions)(withRouter(BlogFormReview));
+export default BlogFormReview;

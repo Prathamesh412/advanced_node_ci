@@ -1,33 +1,70 @@
-import axios from 'axios';
-import { FETCH_USER, FETCH_BLOGS, FETCH_BLOG } from './types';
+export const FETCH_USER = 'FETCH_USER';
+export const FETCH_BLOGS = 'FETCH_BLOGS';
+export const FETCH_BLOG = 'FETCH_BLOG';
 
 export const fetchUser = () => async dispatch => {
-  const res = await axios.get('/api/current_user');
+  try {
+    const response = await fetch('/api/current_user', {
+      method: 'GET',
+      credentials: 'include', // Include cookies
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
 
-  dispatch({ type: FETCH_USER, payload: res.data });
-};
+    if (!response.ok) {
+      dispatch({ type: FETCH_USER, payload: false });
+      return;
+    }
 
-export const handleToken = token => async dispatch => {
-  const res = await axios.post('/api/stripe', token);
-
-  dispatch({ type: FETCH_USER, payload: res.data });
-};
-
-export const submitBlog = (values, history) => async dispatch => {
-  const res = await axios.post('/api/blogs', values);
-
-  history.push('/blogs');
-  dispatch({ type: FETCH_BLOG, payload: res.data });
+    const data = await response.json();
+    dispatch({ type: FETCH_USER, payload: data });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    dispatch({ type: FETCH_USER, payload: false });
+  }
 };
 
 export const fetchBlogs = () => async dispatch => {
-  const res = await axios.get('/api/blogs');
+  try {
+    const response = await fetch('/api/blogs', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
 
-  dispatch({ type: FETCH_BLOGS, payload: res.data });
+    if (!response.ok) {
+      console.error('Error fetching blogs');
+      return;
+    }
+
+    const data = await response.json();
+    dispatch({ type: FETCH_BLOGS, payload: data });
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+  }
 };
 
-export const fetchBlog = id => async dispatch => {
-  const res = await axios.get(`/api/blogs/${id}`);
+export const fetchBlog = (id) => async dispatch => {
+  try {
+    const response = await fetch(`/api/blogs/${id}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
 
-  dispatch({ type: FETCH_BLOG, payload: res.data });
+    if (!response.ok) {
+      console.error('Error fetching blog');
+      return;
+    }
+
+    const data = await response.json();
+    dispatch({ type: FETCH_BLOG, payload: data });
+  } catch (error) {
+    console.error('Error fetching blog:', error);
+  }
 };
