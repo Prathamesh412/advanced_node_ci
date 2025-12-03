@@ -3,3 +3,6 @@ nohup.out
 .DS_Store
 dev.js
 config/dev.js
+.env
+.env.local
+.env.*.local
