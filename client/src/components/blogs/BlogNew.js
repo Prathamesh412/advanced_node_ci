@@ -18,14 +18,21 @@ function BlogNew() {
         return;
       }
 
+      const formData = new FormData();
+      formData.append('title', formValues.title);
+      formData.append('content', formValues.content);
+      if (formValues.image) {
+        formData.append('image', formValues.image);
+      }
+
       const response = await fetch('/api/blogs', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          // Let the browser set the correct multipart boundary; don't set Content-Type manually
           'Authorization': `Bearer ${token}`
         },
         credentials: 'include',
-        body: JSON.stringify(formValues)
+        body: formData
       });
 
       console.log('Response status:', response.status);

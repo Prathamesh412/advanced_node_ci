@@ -16,11 +16,25 @@ function BlogShow() {
     return <div>Loading...</div>;
   }
 
-  const { title, content } = blog;
+  const { title, content, imageUrl } = blog;
 
   return (
     <div>
       <h3>{title}</h3>
+      {imageUrl && (
+        <div style={{ marginBottom: '20px' }}>
+          <img 
+            src={imageUrl} 
+            alt={title} 
+            style={{ 
+              maxWidth: '100%', 
+              height: 'auto', 
+              borderRadius: '4px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }} 
+          />
+        </div>
+      )}
       <p>{content}</p>
     </div>
   );

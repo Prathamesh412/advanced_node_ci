@@ -14,6 +14,11 @@ function BlogList() {
   const renderBlogs = () => {
     return Object.values(blogs).map(blog => (
       <div className="card darken-1 horizontal" key={blog._id}>
+        {blog.imageUrl && (
+          <div className="card-image">
+            <img src={blog.imageUrl} alt={blog.title} style={{ maxHeight: '200px', objectFit: 'cover' }} />
+          </div>
+        )}
         <div className="card-stacked">
           <div className="card-content">
             <span className="card-title">{blog.title}</span>
